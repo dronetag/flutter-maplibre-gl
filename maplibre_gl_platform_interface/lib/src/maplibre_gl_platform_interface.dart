@@ -76,6 +76,7 @@ abstract class MapLibrePlatform {
   Future invalidateAmbientCache();
   Future clearAmbientCache();
   Future<LatLng?> requestMyLocationLatLng();
+  Future<void> triggerGeolocationControl();
 
   Future<LatLngBounds> getVisibleRegion();
 
