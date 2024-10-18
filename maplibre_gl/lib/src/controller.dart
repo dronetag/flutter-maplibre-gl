@@ -1122,6 +1122,10 @@ class MapLibreMapController extends ChangeNotifier {
     return _maplibrePlatform.requestMyLocationLatLng();
   }
 
+  Future<void> triggerGeolocationControl() async {
+    return _maplibrePlatform.triggerGeolocationControl();
+  }
+
   /// This method returns the boundaries of the region currently displayed in the map.
   Future<LatLngBounds> getVisibleRegion() async {
     return _maplibrePlatform.getVisibleRegion();
