@@ -501,6 +501,9 @@ class MapLibreMethodChannel extends MapLibrePlatform {
   }
 
   @override
+  Future<void> triggerGeolocationControl() async {}
+
+  @override
   Future<LatLngBounds> getVisibleRegion() async {
     try {
       final Map<dynamic, dynamic> reply = await _channel.invokeMethod(
