@@ -366,6 +366,11 @@ class MapLibreMapController extends MapLibrePlatform
   }
 
   @override
+  Future<void> triggerGeolocationControl() async {
+    _geolocateControl?.trigger();
+  }
+
+  @override
   Future<LatLngBounds> getVisibleRegion() async {
     final bounds = _map.getBounds();
     return LatLngBounds(
