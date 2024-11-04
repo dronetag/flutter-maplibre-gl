@@ -30,8 +30,11 @@ abstract class AnnotationManager<T extends Annotation> {
   Set<T> get annotations => _idToAnnotation.values.toSet();
 
   AnnotationManager(this.controller,
-      {this.onTap, this.selectLayer, required this.enableInteraction})
-      : id = getRandomString() {
+      {String? id,
+      this.onTap,
+      this.selectLayer,
+      required this.enableInteraction})
+      : id = id ?? getRandomString() {
     for (var i = 0; i < allLayerProperties.length; i++) {
       final layerId = _makeLayerId(i);
       controller.addGeoJsonSource(layerId, buildFeatureCollection([]),
@@ -168,7 +171,8 @@ abstract class AnnotationManager<T extends Annotation> {
 }
 
 class LineManager extends AnnotationManager<Line> {
-  LineManager(super.controller, {super.onTap, super.enableInteraction = true})
+  LineManager(super.controller,
+      {super.id, super.onTap, super.enableInteraction = true})
       : super(
           selectLayer: (Line line) => line.options.linePattern == null ? 0 : 1,
         );
@@ -194,6 +198,7 @@ class LineManager extends AnnotationManager<Line> {
 class FillManager extends AnnotationManager<Fill> {
   FillManager(
     super.controller, {
+    super.id,
     super.onTap,
     super.enableInteraction = true,
   }) : super(
@@ -219,6 +224,7 @@ class FillManager extends AnnotationManager<Fill> {
 class CircleManager extends AnnotationManager<Circle> {
   CircleManager(
     super.controller, {
+    super.id,
     super.onTap,
     super.enableInteraction = true,
   });
@@ -240,6 +246,7 @@ class CircleManager extends AnnotationManager<Circle> {
 class SymbolManager extends AnnotationManager<Symbol> {
   SymbolManager(
     super.controller, {
+    super.id,
     super.onTap,
     bool iconAllowOverlap = false,
     bool textAllowOverlap = false,
