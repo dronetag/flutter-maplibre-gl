@@ -54,9 +54,10 @@ abstract class AnnotationManager<T extends Annotation> {
 
   AnnotationManager(
     this.controller, {
+    String? id,
     this.selectLayer,
     required this.enableInteraction,
-  }) : id = getRandomString();
+  }) : id = id ?? getRandomString();
 
   @mustCallSuper
   Future<void> initialize() async {
@@ -228,6 +229,7 @@ abstract class AnnotationManager<T extends Annotation> {
 class LineManager extends AnnotationManager<Line> {
   LineManager(
     super.controller, {
+    super.id,
     super.enableInteraction = true,
   }) : super(
          selectLayer: (line) => line.options.linePattern == null ? 0 : 1,
@@ -255,6 +257,7 @@ class LineManager extends AnnotationManager<Line> {
 class FillManager extends AnnotationManager<Fill> {
   FillManager(
     super.controller, {
+    super.id,
     super.enableInteraction = true,
   }) : super(
          selectLayer: (fill) => fill.options.fillPattern == null ? 0 : 1,
@@ -279,6 +282,7 @@ class FillManager extends AnnotationManager<Fill> {
 class CircleManager extends AnnotationManager<Circle> {
   CircleManager(
     super.controller, {
+    super.id,
     super.enableInteraction = true,
   });
 
@@ -299,6 +303,7 @@ class CircleManager extends AnnotationManager<Circle> {
 class SymbolManager extends AnnotationManager<Symbol> {
   SymbolManager(
     super.controller, {
+    super.id,
     bool iconAllowOverlap = false,
     bool textAllowOverlap = false,
     bool iconIgnorePlacement = false,
