@@ -194,7 +194,7 @@ class MapLibreMapController extends ChangeNotifier {
       notifyListeners();
     });
 
-    _maplibrePlatform.onMapStyleLoadedPlatform.add((_) {
+    _maplibrePlatform.onMapStyleLoadedPlatform.add((_) async {
       final interactionEnabled = annotationConsumeTapEvents.toSet();
       for (final type in annotationOrder.toSet()) {
         final enableInteraction = interactionEnabled.contains(type);
@@ -204,21 +204,25 @@ class MapLibreMapController extends ChangeNotifier {
               this,
               enableInteraction: enableInteraction,
             );
+            await fillManager!.initialize();
           case AnnotationType.line:
             lineManager = LineManager(
               this,
               enableInteraction: enableInteraction,
             );
+            await lineManager!.initialize();
           case AnnotationType.circle:
             circleManager = CircleManager(
               this,
               enableInteraction: enableInteraction,
             );
+            await circleManager!.initialize();
           case AnnotationType.symbol:
             symbolManager = SymbolManager(
               this,
               enableInteraction: enableInteraction,
             );
+            await symbolManager!.initialize();
         }
       }
       onStyleLoadedCallback?.call();
