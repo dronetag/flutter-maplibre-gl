@@ -713,7 +713,7 @@ class MapLibreMapController extends MapLibrePlatform
   }
 
   @override
-  void setStyleString(String? styleString) {
+  void setStyleString(String? styleString, {bool allowDiff = true}) {
     //remove old mouseenter callbacks to avoid multicalling
     for (final layerId in _interactiveFeatureLayerIds) {
       _map.off('mouseenter', layerId, _onMouseEnterFeature);
@@ -723,7 +723,7 @@ class MapLibreMapController extends MapLibrePlatform
     }
     _interactiveFeatureLayerIds.clear();
 
-    _map.setStyle(styleString);
+    _map.setStyle(styleString, {"diff": allowDiff});
     // catch style loaded for later style changes
     if (_mapReady) {
       _map.once("styledata", _onStyleData);

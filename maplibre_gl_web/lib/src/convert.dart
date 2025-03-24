@@ -20,7 +20,7 @@ class Convert {
       sink.setCompassEnabled(options['compassEnabled']);
     }
     if (options.containsKey('styleString')) {
-      sink.setStyleString(options['styleString']);
+      sink.setStyleString(options['styleString'], allowDiff: false);
     }
     if (options.containsKey('minMaxZoomPreference')) {
       sink.setMinMaxZoomPreference(options['minMaxZoomPreference'][0],
