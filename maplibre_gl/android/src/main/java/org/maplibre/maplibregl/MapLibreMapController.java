@@ -319,7 +319,7 @@ final class MapLibreMapController
   }
 
   String getLastLayerOnStyle(Style style) {
-    if (style != null) {
+    if (style != null && style.isFullyLoaded()) {
       final List<Layer> layers = style.getLayers();
 
       if (layers.size() > 0) {
@@ -653,7 +653,7 @@ final class MapLibreMapController
   }
 
   private Feature firstFeatureOnLayers(RectF in) {
-    if (style != null) {
+    if (style != null && style.isFullyLoaded()) {
       final List<Layer> layers = style.getLayers();
       final List<String> layersInOrder = new ArrayList<String>();
       for (Layer layer : layers) {
