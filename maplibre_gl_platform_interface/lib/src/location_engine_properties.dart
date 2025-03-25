@@ -15,7 +15,7 @@ class LocationEnginePlatforms {
       LocationEnginePlatforms();
 
   List<int> toList() {
-    if (Platform.isAndroid) return androidPlatform.toList();
+    if (!kIsWeb && Platform.isAndroid) return androidPlatform.toList();
     return [];
   }
 }
