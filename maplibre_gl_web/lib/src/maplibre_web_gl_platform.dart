@@ -462,6 +462,8 @@ class MapLibreMapController extends MapLibrePlatform
       'point': Point<double>(e.point.x.toDouble(), e.point.y.toDouble()),
       'latLng': LatLng(e.lngLat.lat.toDouble(), e.lngLat.lng.toDouble()),
       if (features.isNotEmpty) "id": features.first.id,
+      // FIXME pass proper layer ID to callback
+      "layerId": "",
     };
     if (features.isNotEmpty) {
       onFeatureTappedPlatform(payload);
