@@ -125,8 +125,8 @@ abstract class MapLibrePlatform {
     required int padding,
   });
 
-  Future<void> setFeatureForGeoJsonSource(
-      String sourceId, Map<String, dynamic> geojsonFeature);
+  Future<void> setFeaturesForGeoJsonSource(
+      String sourceId, List<Map<String, dynamic>> geojsonFeatures);
 
   Future<void> removeSource(String sourceId);
 
