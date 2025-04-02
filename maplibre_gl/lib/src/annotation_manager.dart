@@ -118,30 +118,62 @@ abstract class AnnotationManager<T extends Annotation> {
   /// Adds a multiple annotations to the map. This much faster than calling add
   /// multiple times
   Future<void> addAll(Iterable<T> annotations) async {
+    final annotationGeojsonsByLayer = <int, List<Map<String, dynamic>>>{};
+
     for (final a in annotations) {
+      final layerIndex = selectLayer != null ? selectLayer!(a) : 0;
       _idToAnnotation[a.id] = a;
+
+      final annotations = annotationGeojsonsByLayer[layerIndex];
+      annotationGeojsonsByLayer[layerIndex] = (annotations ?? <Map<String, dynamic>>[])..add(a.toGeoJson());
     }
-    await _setAll();
+
+    for (final layerIndex in annotationGeojsonsByLayer.keys) {
+      final layerId = _makeLayerId(layerIndex);
+      final geojsons = annotationGeojsonsByLayer[layerIndex];
+
+      if (geojsons != null && geojsons.isNotEmpty) {
+        await controller.setGeoJsonFeatures(layerId, geojsons);
+      }
+    }
   }
 
   /// add a single annotation to the map
   Future<void> add(T annotation) async {
     _idToAnnotation[annotation.id] = annotation;
-    await _setAll();
+    final layerIndex = selectLayer != null ? selectLayer!(annotation) : 0;
+    await controller.setGeoJsonFeature(
+        _makeLayerId(layerIndex), annotation.toGeoJson());
   }
 
   /// Removes multiple annotations from the map
   Future<void> removeAll(Iterable<T> annotations) async {
+    final annotationIdsByLayer = <int, List<dynamic>>{};
+
     for (final a in annotations) {
+      final layerIndex = selectLayer != null ? selectLayer!(a) : 0;
       _idToAnnotation.remove(a.id);
+
+      final ids = annotationIdsByLayer[layerIndex];
+      annotationIdsByLayer[layerIndex] = (ids ?? <dynamic>[])..add(a.id);
     }
-    await _setAll();
+
+    for (final layerIndex in annotationIdsByLayer.keys) {
+      final layerId = _makeLayerId(layerIndex);
+      final annotationIds = annotationIdsByLayer[layerIndex];
+
+      if (annotationIds != null && annotationIds.isNotEmpty) {
+        await controller.removeGeoJsonFeatures(layerId, annotationIds);
+      }
+    }
   }
 
   /// Remove a single annotation form the map
   Future<void> remove(T annotation) async {
+    final layerIndex = selectLayer != null ? selectLayer!(annotation) : 0;
     _idToAnnotation.remove(annotation.id);
-    await _setAll();
+    await controller
+        .removeGeoJsonFeatures(_makeLayerId(layerIndex), [annotation.id]);
   }
 
   /// Removes all annotations from the map
