@@ -791,12 +791,17 @@ class MapLibreMethodChannel extends MapLibrePlatform {
   }
 
   @override
-  Future<void> setFeatureForGeoJsonSource(
-      String sourceId, Map<String, dynamic> geojsonFeature) async {
-    await _channel.invokeMethod('source#setFeature', <String, dynamic>{
-      'sourceId': sourceId,
-      'geojsonFeature': jsonEncode(geojsonFeature)
-    });
+  Future<void> setFeaturesForGeoJsonSource(
+      String sourceId, List<Map<String, dynamic>> geojsonFeatures) async {
+    // TODO make idempotent (adding likely not supported)
+    // TODO implement true batch processing
+
+    for (final geojsonFeature in geojsonFeatures) {
+      await _channel.invokeMethod('source#setFeature', <String, dynamic>{
+        'sourceId': sourceId,
+        'geojsonFeature': jsonEncode(geojsonFeature)
+      });
+    }
   }
 
   @override
