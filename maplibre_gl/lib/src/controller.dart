@@ -438,10 +438,16 @@ class MapLibreMapController extends ChangeNotifier {
   ///
   /// The returned [Future] completes after the change has been made on the
   /// platform side.
+  // TODO deprecate
   Future<void> setGeoJsonFeature(
-      String sourceId, Map<String, dynamic> geojsonFeature) async {
-    await _maplibrePlatform.setFeatureForGeoJsonSource(
-        sourceId, geojsonFeature);
+          String sourceId, Map<String, dynamic> geojsonFeature) =>
+      setGeoJsonFeatures(sourceId, [geojsonFeature]);
+
+  // TODO document
+  Future<void> setGeoJsonFeatures(
+      String sourceId, List<Map<String, dynamic>> geojsonFeatures) async {
+    await _maplibrePlatform.setFeaturesForGeoJsonSource(
+        sourceId, geojsonFeatures);
   }
 
   /// Add a symbol layer to the map with the given properties
