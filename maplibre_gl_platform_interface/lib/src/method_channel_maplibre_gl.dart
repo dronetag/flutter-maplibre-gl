@@ -1011,6 +1011,16 @@ class MapLibreMethodChannel extends MapLibrePlatform {
     }
   }
 
+  Future<void> removeFeaturesForGeoJsonSource(
+    String sourceId,
+    List<dynamic> featureIds,
+  ) async {
+    await _channel.invokeMethod('source#removeFeatures', <String, dynamic>{
+      'sourceId': sourceId,
+      'featureIds': featureIds,
+    });
+  }
+
   @override
   Future<void> setFeatureState(
     String sourceId,

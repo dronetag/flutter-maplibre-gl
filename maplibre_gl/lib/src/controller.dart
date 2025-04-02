@@ -489,9 +489,24 @@ class MapLibreMapController extends ChangeNotifier {
 
   // TODO document
   Future<void> setGeoJsonFeatures(
-      String sourceId, List<Map<String, dynamic>> geojsonFeatures) async {
+    String sourceId,
+    List<Map<String, dynamic>> geojsonFeatures,
+  ) async {
     await _maplibrePlatform.setFeaturesForGeoJsonSource(
-        sourceId, geojsonFeatures);
+      sourceId,
+      geojsonFeatures,
+    );
+  }
+
+  // TODO document
+  Future<void> removeGeoJsonFeatures(
+    String sourceId,
+    List<dynamic> featureIds,
+  ) async {
+    await _maplibrePlatform.removeFeaturesForGeoJsonSource(
+      sourceId,
+      featureIds,
+    );
   }
 
   /// Sets the state of a feature.
