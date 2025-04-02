@@ -4,6 +4,8 @@ library;
 import 'package:js/js.dart';
 import 'package:maplibre_gl_web/src/interop/geo/geojson_interop.dart';
 
+import 'geojson_source_diff_interop.dart';
+
 @JS()
 @anonymous
 class GeoJsonSourceJsImpl {
@@ -19,4 +21,6 @@ class GeoJsonSourceJsImpl {
 
   external GeoJsonSourceJsImpl setData(
       FeatureCollectionJsImpl featureCollection);
+
+  external GeoJsonSourceJsImpl updateData(GeoJsonSourceDiffJsImpl diff);
 }
