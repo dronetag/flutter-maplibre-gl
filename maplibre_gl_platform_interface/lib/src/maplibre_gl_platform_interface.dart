@@ -252,9 +252,9 @@ abstract class MapLibrePlatform {
     required int padding,
   });
 
-  Future<void> setFeatureForGeoJsonSource(
+  Future<void> setFeaturesForGeoJsonSource(
     String sourceId,
-    Map<String, dynamic> geojsonFeature,
+    List<Map<String, dynamic>> geojsonFeatures,
   );
 
   Future<void> setFeatureState(

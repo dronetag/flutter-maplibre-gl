@@ -98,20 +98,19 @@ class MapLibreMethodChannel extends MapLibrePlatform {
             speed: userLocation['speed'],
             horizontalAccuracy: userLocation['horizontalAccuracy'],
             verticalAccuracy: userLocation['verticalAccuracy'],
-            heading:
-                heading == null
-                    ? null
-                    : UserHeading(
-                      magneticHeading: heading['magneticHeading'],
-                      trueHeading: heading['trueHeading'],
-                      headingAccuracy: heading['headingAccuracy'],
-                      x: heading['x'],
-                      y: heading['y'],
-                      z: heading['z'],
-                      timestamp: DateTime.fromMillisecondsSinceEpoch(
-                        heading['timestamp'],
-                      ),
+            heading: heading == null
+                ? null
+                : UserHeading(
+                    magneticHeading: heading['magneticHeading'],
+                    trueHeading: heading['trueHeading'],
+                    headingAccuracy: heading['headingAccuracy'],
+                    x: heading['x'],
+                    y: heading['y'],
+                    z: heading['z'],
+                    timestamp: DateTime.fromMillisecondsSinceEpoch(
+                      heading['timestamp'],
                     ),
+                  ),
             timestamp: DateTime.fromMillisecondsSinceEpoch(
               userLocation['timestamp'],
             ),
@@ -145,8 +144,7 @@ class MapLibreMethodChannel extends MapLibrePlatform {
           ) {
             return AndroidViewSurface(
               controller: controller as AndroidViewController,
-              gestureRecognizers:
-                  gestureRecognizers ??
+              gestureRecognizers: gestureRecognizers ??
                   const <Factory<OneSequenceGestureRecognizer>>{},
               hitTestBehavior: PlatformViewHitTestBehavior.opaque,
             );
@@ -998,14 +996,19 @@ class MapLibreMethodChannel extends MapLibrePlatform {
   }
 
   @override
-  Future<void> setFeatureForGeoJsonSource(
+  Future<void> setFeaturesForGeoJsonSource(
     String sourceId,
-    Map<String, dynamic> geojsonFeature,
+    List<Map<String, dynamic>> geojsonFeatures,
   ) async {
-    await _channel.invokeMethod('source#setFeature', <String, dynamic>{
-      'sourceId': sourceId,
-      'geojsonFeature': jsonEncode(geojsonFeature),
-    });
+    // TODO make idempotent (adding likely not supported)
+    // TODO implement true batch processing
+
+    for (final geojsonFeature in geojsonFeatures) {
+      await _channel.invokeMethod('source#setFeature', <String, dynamic>{
+        'sourceId': sourceId,
+        'geojsonFeature': jsonEncode(geojsonFeature)
+      });
+    }
   }
 
   @override
