@@ -1153,8 +1153,36 @@ class MapLibreMapController extends MapLibrePlatform
     final newData = FeatureCollection(features: features);
     _addedFeaturesByLayer[sourceId] = newData;
   }
-      }
+
+  @override
+  Future<void> removeFeaturesForGeoJsonSource(
+      String sourceId, List<dynamic> featureIds) async {
+    final source = _map.getSource(sourceId) as GeoJsonSource?;
+    final data = _addedFeaturesByLayer[sourceId];
+
+    if (source == null || data == null) {
+      return;
     }
+
+    final removedFeatures = <dynamic>[];
+
+    // Create copy of current features in source
+    final features = data.features.toList();
+
+    for (final featureId in featureIds) {
+      final index = features.indexWhere((f) => f.id == featureId);
+      if (index < 0) {
+        continue;
+      }
+
+      features.removeAt(index);
+      removedFeatures.add(featureId);
+    }
+
+    source.updateData(GeoJsonSourceDiff(remove: removedFeatures));
+
+    final newData = FeatureCollection(features: features);
+    _addedFeaturesByLayer[sourceId] = newData;
   }
 
   @override
