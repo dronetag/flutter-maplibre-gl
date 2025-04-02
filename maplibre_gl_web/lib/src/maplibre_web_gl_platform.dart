@@ -1132,13 +1132,40 @@ class MapLibreMapController extends MapLibrePlatform
     if (source != null && data != null) {
       final feature = _makeFeature(geojsonFeature);
       final features = data.features.toList();
+
       final index = features.indexWhere((f) => f.id == feature.id);
       if (index >= 0) {
+        // Feature exists, update all fields
         features[index] = feature;
         final newData = FeatureCollection(features: features);
         _addedFeaturesByLayer[sourceId] = newData;
 
-        source.setData(newData);
+        print(
+            'Performing feature update for source ${sourceId}, feature ${feature.id}');
+        source.updateData(GeoJsonSourceDiff(
+          update: [
+            GeoJsonFeatureDiff(
+              id: feature.id,
+              newGeometry: feature.geometry,
+              removeAllProperties: true,
+              addOrUpdateProperties: [
+                for (final entry in feature.properties.entries)
+                  FeaturePropertyUpdate(entry.key, entry.value)
+              ],
+            )
+          ],
+        ));
+      } else {
+        // Feature is new, add it
+        features.add(feature);
+        final newData = FeatureCollection(features: features);
+        _addedFeaturesByLayer[sourceId] = newData;
+
+        print(
+            'Adding new feature for source ${sourceId}, feature ${feature.id}');
+        source.updateData(GeoJsonSourceDiff(
+          add: [feature],
+        ));
       }
     }
   }
