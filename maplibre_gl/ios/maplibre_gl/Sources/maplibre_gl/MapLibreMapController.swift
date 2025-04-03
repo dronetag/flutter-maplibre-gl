@@ -1011,16 +1011,23 @@ class MapLibreMapController: NSObject, FlutterPlatformView, MLNMapViewDelegate, 
             case let .failure(error): result(error.flutterError)
             }
 
-        case "source#setFeature":
+        case "source#setFeatures":
             guard let arguments = methodCall.arguments as? [String: Any] else { return }
             guard let sourceId = arguments["sourceId"] as? String else { return }
-            guard let geojson = arguments["geojsonFeature"] as? String else { return }
-            let setResult = setFeature(sourceId: sourceId, geojsonFeature: geojson)
+            guard let geojsonFeatures = arguments["geojsonFeatures"] as? [String] else { return }
+            let setResult = setFeatures(sourceId: sourceId, geojsonFeatures: geojsonFeatures)
 
             switch setResult {
-            case .success: result(nil)
-            case let .failure(error): result(error.flutterError)
+                case .success: result(nil)
+                case let .failure(error): result(error.flutterError)
             }
+
+        case "source#removeFeatures":
+            guard let arguments = methodCall.arguments as? [String: Any] else { return }
+            guard let sourceId = arguments["sourceId"] as? String else { return }
+            guard let featureIds = arguments["featureIds"] as? [String] else { return }
+            removeFeatures(sourceId: sourceId, featureIds: featureIds)
+            result(nil)
 
         case "layer#setVisibility":
             guard let arguments = methodCall.arguments as? [String: Any] else { return }
@@ -1903,51 +1910,70 @@ class MapLibreMapController: NSObject, FlutterPlatformView, MLNMapViewDelegate, 
         }catch{
             return .failure(.geojsonParseError(sourceId: sourceId))
         }
-
     }
 
-
-    func setFeature(sourceId: String, geojsonFeature: String) -> Result<Void, MethodCallError> {
-        guard let style = mapView.style else {
+    func setFeatures(sourceId: String, geojsonFeatures: [String]) -> Result<Void, MethodCallError> {
+        guard let style = mapView.style else { 
             return .failure(.styleNotFound)
         }
         do {
-            let newShape = try MLNShape(
-                data: geojsonFeature.data(using: .utf8)!,
-                encoding: String.Encoding.utf8.rawValue
-            )
-            guard let source = style.source(withIdentifier: sourceId) as? MLNShapeSource else {
+            guard let source = mapView.style?.source(withIdentifier: sourceId) as? MLNShapeSource else { 
                 return .failure(.sourceNotFound(sourceId: sourceId))
             }
-            if let shape = addedShapesByLayer[sourceId] as? MLNShapeCollectionFeature,
-               let feature = newShape as? MLNShape & MLNFeature
-            {
+            guard let shape = addedShapesByLayer[sourceId] as? MLNShapeCollectionFeature else { 
+                return .failure(.genericError(details: "Failed to set feature for sourceId \(sourceId)"))
+            }
+            var shapes = shape.shapes
+
+            for geojsonFeature in geojsonFeatures {
+                let newShape = try MLNShape(
+                    data: geojsonFeature.data(using: .utf8)!,
+                    encoding: String.Encoding.utf8.rawValue
+                )
+
+                guard let feature = newShape as? MLNShape & MLNFeature else { continue }
                 if let index = shape.shapes
                     .firstIndex(where: {
                         if let id = $0.identifier as? String,
-                           let featureId = feature.identifier as? String
+                        let featureId = feature.identifier as? String
                         { return id == featureId }
 
                         if let id = $0.identifier as? NSNumber,
-                           let featureId = feature.identifier as? NSNumber
+                        let featureId = feature.identifier as? NSNumber
                         { return id == featureId }
+
                         return false
                     })
                 {
-                    var shapes = shape.shapes
                     shapes[index] = feature
-
-                    source.shape = MLNShapeCollectionFeature(shapes: shapes)
+                } else {
+                    shapes.append(feature)
                 }
-
-                addedShapesByLayer[sourceId] = source.shape
-                return .success(())
             }
-            return .failure(.genericError(details: "Failed to set feature for sourceId \(sourceId)"))
 
+            source.shape = MLNShapeCollectionFeature(shapes: shapes)
+            addedShapesByLayer[sourceId] = source.shape
+            return .success(())
         } catch {
             return .failure(.geojsonParseError(sourceId: sourceId))
         }
+    }
+
+    func removeFeatures(sourceId: String, featureIds: [String]) {
+        guard let source = mapView.style?.source(withIdentifier: sourceId) as? MLNShapeSource else { return }
+        guard let shape = addedShapesByLayer[sourceId] as? MLNShapeCollectionFeature else { return }
+        var shapes = shape.shapes
+
+        shapes.removeAll(where: {
+            if let id = $0.identifier as? String {
+                return featureIds.contains(id)
+            } else {
+                return false
+            }
+        })
+
+        source.shape = MLNShapeCollectionFeature(shapes: shapes)
+        addedShapesByLayer[sourceId] = source.shape
     }
 
     /*
