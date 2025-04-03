@@ -397,21 +397,52 @@ final class MapLibreMapController
     geoJsonSource.setGeoJson(featureCollection);
   }
 
-  private void setGeoJsonFeature(String sourceName, String geojsonFeature) {
-    Feature feature = Feature.fromJson(geojsonFeature);
+  private void setGeoJsonFeatures(String sourceName, List<String> geojsonFeatures) {
     FeatureCollection featureCollection = addedFeaturesByLayer.get(sourceName);
     GeoJsonSource geoJsonSource = style.getSourceAs(sourceName);
-    if (featureCollection != null && geoJsonSource != null) {
-      final List<Feature> features = featureCollection.features();
+
+    if (featureCollection == null || geoJsonSource == null) {
+      // TODO create new source if it does not exist
+      return;
+    }
+
+    final List<Feature> features = featureCollection.features();
+    if (features == null) {
+      // TODO handle and create new feature list if it is null
+      return;
+    }
+
+    for (final String geojsonFeature : geojsonFeatures) {
+      Feature feature = Feature.fromJson(geojsonFeature);
+      final String featureId = feature.id();
+
+      if (featureId == null) {
+        continue;
+      }
+
+      int firstIndex = -1;
       for (int i = 0; i < features.size(); i++) {
-        final String id = features.get(i).id();
-        if (id.equals(feature.id())) {
+        final String collectionFeatureId = features.get(i).id();
+        if (collectionFeatureId == null) {
+          continue;
+        }
+
+        if (collectionFeatureId.equals(featureId)) {
           features.set(i, feature);
+          firstIndex = i;
           break;
         }
       }
 
-      geoJsonSource.setGeoJson(featureCollection);
+      if (firstIndex < 0) {
+        // Feature is new, add it to feature collection
+        features.add(feature);
+      }
+    }
+
+    geoJsonSource.setGeoJson(featureCollection);
+  }
+
     }
   }
 
@@ -976,6 +1007,14 @@ final class MapLibreMapController
           break;
         }
       case "source#setFeature":
+      case "source#setFeatures":
+        {
+          final String sourceId = call.argument("sourceId");
+          final List<String> geojsonFeatures = call.argument("geojsonFeatures");
+          setGeoJsonFeatures(sourceId, geojsonFeatures);
+          result.success(null);
+          break;
+        }
         {
           final String sourceId = call.argument("sourceId");
           final String geojsonFeature = call.argument("geojsonFeature");
