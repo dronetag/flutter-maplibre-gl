@@ -481,34 +481,62 @@ final class MapLibreMapController
     }
   }
 
-  private void setGeoJsonFeature(String sourceName, String geojsonFeature) {
+  private void setGeoJsonFeatures(String sourceName, List<String> geojsonFeatures) {
     if (style == null || !style.isFullyLoaded()) {
-      Log.w(TAG, "setGeoJsonFeature: style not ready, skipping update");
+      Log.w(TAG, "setGeoJsonFeatures: style not ready, skipping update");
       return;
     }
 
     try {
-      Feature feature = Feature.fromJson(geojsonFeature);
       FeatureCollection featureCollection = addedFeaturesByLayer.get(sourceName);
-      GeoJsonSource geoJsonSource = style.getSourceAs(sourceName);
+      if (featureCollection == null) {
+        Log.w(TAG, "setGeoJsonFeatures: unsupported GeoJSON type, skipping update");
+        return;
+      }
 
-      if (featureCollection != null && geoJsonSource != null) {
+      GeoJsonSource geoJsonSource = style.getSourceAs(sourceName);
+      if (geoJsonSource == null) {
+        Log.w(TAG, "setGeoJsonFeatures: source '" + sourceName + "' not found, skipping update");
+        return;
+      }
+
+      final List<Feature> features = featureCollection.features();
+      if (features == null) {
+        // TODO handle and create new feature list if it is null
+        return;
+      }
+
+      for (final String geojsonFeature : geojsonFeatures) {
+        Feature feature = Feature.fromJson(geojsonFeature);
         final String featureId = feature.id();
-        final List<Feature> features = featureCollection.features();
-        
-        if (featureId != null && features != null) {
-          for (int i = 0; i < features.size(); i++) {
-            if (featureId.equals(features.get(i).id())) {
-              features.set(i, feature);
-              break;
-            }
+
+        if (featureId == null) {
+          continue;
+        }
+
+        int firstIndex = -1;
+        for (int i = 0; i < features.size(); i++) {
+          final String collectionFeatureId = features.get(i).id();
+          if (collectionFeatureId == null) {
+            continue;
+          }
+
+          if (collectionFeatureId.equals(featureId)) {
+            features.set(i, feature);
+            firstIndex = i;
+            break;
           }
         }
 
-        geoJsonSource.setGeoJson(featureCollection);
+        if (firstIndex < 0) {
+          // Feature is new, add it to feature collection
+          features.add(feature);
+        }
       }
-    } catch (Exception e) {
-      Log.e(TAG, "setGeoJsonFeature: error updating feature in source '" + sourceName + "'", e);
+
+      geoJsonSource.setGeoJson(featureCollection);
+    }  catch (Exception e) {
+      Log.e(TAG, "setGeoJsonFeatures: error updating source '" + sourceName + "'", e);
     }
   }
 
@@ -1303,6 +1331,14 @@ final class MapLibreMapController
           break;
         }
       case "source#setFeature":
+      case "source#setFeatures":
+        {
+          final String sourceId = call.argument("sourceId");
+          final List<String> geojsonFeatures = call.argument("geojsonFeatures");
+          setGeoJsonFeatures(sourceId, geojsonFeatures);
+          result.success(null);
+          break;
+        }
         {
           final String sourceId = call.argument("sourceId");
           final String geojsonFeature = call.argument("geojsonFeature");
