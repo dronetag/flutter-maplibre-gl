@@ -832,11 +832,18 @@ class MapLibreMapController: NSObject, FlutterPlatformView, MLNMapViewDelegate, 
             setSource(sourceId: sourceId, geojson: geojson)
             result(nil)
 
-        case "source#setFeature":
+        case "source#setFeatures":
             guard let arguments = methodCall.arguments as? [String: Any] else { return }
             guard let sourceId = arguments["sourceId"] as? String else { return }
-            guard let geojson = arguments["geojsonFeature"] as? String else { return }
-            setFeature(sourceId: sourceId, geojsonFeature: geojson)
+            guard let geojsonFeatures = arguments["geojsonFeatures"] as? [String] else { return }
+            setFeatures(sourceId: sourceId, geojsonFeatures: geojsonFeatures)
+            result(nil)
+
+        case "source#removeFeatures":
+            guard let arguments = methodCall.arguments as? [String: Any] else { return }
+            guard let sourceId = arguments["sourceId"] as? String else { return }
+            guard let featureIds = arguments["featureIds"] as? [String] else { return }
+            removeFeatures(sourceId: sourceId, featureIds: featureIds)
             result(nil)
 
         case "layer#setVisibility":
@@ -1627,38 +1634,58 @@ class MapLibreMapController: NSObject, FlutterPlatformView, MLNMapViewDelegate, 
         } catch {}
     }
 
-    func setFeature(sourceId: String, geojsonFeature: String) {
+    func setFeatures(sourceId: String, geojsonFeatures: [String]) {
         do {
-            let newShape = try MLNShape(
-                data: geojsonFeature.data(using: .utf8)!,
-                encoding: String.Encoding.utf8.rawValue
-            )
-            if let source = mapView.style?.source(withIdentifier: sourceId) as? MLNShapeSource,
-               let shape = addedShapesByLayer[sourceId] as? MLNShapeCollectionFeature,
-               let feature = newShape as? MLNShape & MLNFeature
-            {
+            guard let source = mapView.style?.source(withIdentifier: sourceId) as? MLNShapeSource else { return }
+            guard let shape = addedShapesByLayer[sourceId] as? MLNShapeCollectionFeature else { return }
+            var shapes = shape.shapes
+
+            for geojsonFeature in geojsonFeatures {
+                let newShape = try MLNShape(
+                    data: geojsonFeature.data(using: .utf8)!,
+                    encoding: String.Encoding.utf8.rawValue
+                )
+
+                guard let feature = newShape as? MLNShape & MLNFeature else { continue }
                 if let index = shape.shapes
                     .firstIndex(where: {
                         if let id = $0.identifier as? String,
-                           let featureId = feature.identifier as? String
+                        let featureId = feature.identifier as? String
                         { return id == featureId }
 
                         if let id = $0.identifier as? NSNumber,
-                           let featureId = feature.identifier as? NSNumber
+                        let featureId = feature.identifier as? NSNumber
                         { return id == featureId }
+
                         return false
                     })
                 {
-                    var shapes = shape.shapes
                     shapes[index] = feature
-
-                    source.shape = MLNShapeCollectionFeature(shapes: shapes)
+                } else {
+                    shapes.append(feature)
                 }
-
-                addedShapesByLayer[sourceId] = source.shape
             }
 
+            source.shape = MLNShapeCollectionFeature(shapes: shapes)
+            addedShapesByLayer[sourceId] = source.shape
         } catch {}
+    }
+
+    func removeFeatures(sourceId: String, featureIds: [String]) {
+        guard let source = mapView.style?.source(withIdentifier: sourceId) as? MLNShapeSource else { return }
+        guard let shape = addedShapesByLayer[sourceId] as? MLNShapeCollectionFeature else { return }
+        var shapes = shape.shapes
+
+        shapes.removeAll(where: {
+            if let id = $0.identifier as? String {
+                return featureIds.contains(id)
+            } else {
+                return false
+            }
+        })
+
+        source.shape = MLNShapeCollectionFeature(shapes: shapes)
+        addedShapesByLayer[sourceId] = source.shape
     }
 
     /*
