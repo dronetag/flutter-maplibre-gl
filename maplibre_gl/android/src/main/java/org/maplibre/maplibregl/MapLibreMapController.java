@@ -443,7 +443,40 @@ final class MapLibreMapController
     geoJsonSource.setGeoJson(featureCollection);
   }
 
+  private void removeGeoJsonFeatures(String sourceName, List<String> featureIds) {
+    FeatureCollection featureCollection = addedFeaturesByLayer.get(sourceName);
+    GeoJsonSource geoJsonSource = style.getSourceAs(sourceName);
+
+    if (featureCollection == null || geoJsonSource == null) {
+      // TODO create new source if it does not exist
+      return;
     }
+
+    final List<Feature> features = featureCollection.features();
+    if (features == null) {
+      // TODO handle and create new feature list if it is null
+      return;
+    }
+
+    for (final String featureId : featureIds) {
+      if (featureId == null) {
+        continue;
+      }
+
+      for (int i = 0; i < features.size(); i++) {
+        final String collectionFeatureId = features.get(i).id();
+        if (collectionFeatureId == null) {
+          continue;
+        }
+
+        if (collectionFeatureId.equals(featureId)) {
+          features.remove(i);
+          break;
+        }
+      }
+    }
+
+    geoJsonSource.setGeoJson(featureCollection);
   }
 
   private void addSymbolLayer(
@@ -1006,7 +1039,6 @@ final class MapLibreMapController
           result.success(null);
           break;
         }
-      case "source#setFeature":
       case "source#setFeatures":
         {
           final String sourceId = call.argument("sourceId");
@@ -1015,10 +1047,11 @@ final class MapLibreMapController
           result.success(null);
           break;
         }
+      case "source#removeFeatures":
         {
           final String sourceId = call.argument("sourceId");
-          final String geojsonFeature = call.argument("geojsonFeature");
-          setGeoJsonFeature(sourceId, geojsonFeature);
+          final List<String> featureIds = call.argument("featureIds");
+          removeGeoJsonFeatures(sourceId, featureIds);
           result.success(null);
           break;
         }
