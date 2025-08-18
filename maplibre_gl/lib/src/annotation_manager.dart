@@ -129,7 +129,8 @@ abstract class AnnotationManager<T extends Annotation> {
       _idToAnnotation[a.id] = a;
 
       final annotations = annotationGeojsonsByLayer[layerIndex];
-      annotationGeojsonsByLayer[layerIndex] = (annotations ?? <Map<String, dynamic>>[])..add(a.toGeoJson());
+      annotationGeojsonsByLayer[layerIndex] =
+          (annotations ?? <Map<String, dynamic>>[])..add(a.toGeoJson());
     }
 
     for (final layerIndex in annotationGeojsonsByLayer.keys) {

@@ -453,7 +453,8 @@ class MapLibreMapController extends ChangeNotifier {
   // TODO document
   Future<void> removeGeoJsonFeatures(
       String sourceId, List<dynamic> featureIds) async {
-    await _maplibrePlatform.removeFeaturesForGeoJsonSource(sourceId, featureIds);
+    await _maplibrePlatform.removeFeaturesForGeoJsonSource(
+        sourceId, featureIds);
   }
 
   /// Add a symbol layer to the map with the given properties
