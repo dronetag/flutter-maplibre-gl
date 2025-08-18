@@ -15,11 +15,13 @@ dependencies:
     git:
       url: git@github.com:dronetag/flutter-maplibre-gl.git
       path: maplibre_gl_platform_interface
+      ref: chore/DT-4233-sync-fork
     
   maplibre_gl_web:
     git:
       url: git@github.com:dronetag/flutter-maplibre-gl.git
       path: maplibre_gl_web
+      ref: chore/DT-4233-sync-fork
 
 dev_dependencies:
   very_good_analysis: ^5.0.0
