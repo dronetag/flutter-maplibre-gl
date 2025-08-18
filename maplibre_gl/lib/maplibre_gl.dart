@@ -50,6 +50,7 @@ export 'package:maplibre_gl_platform_interface/maplibre_gl_platform_interface.da
     show
         Annotation,
         ArgumentCallbacks,
+        ArgumentCallbacks2,
         AttributionButtonPosition,
         CameraPosition,
         CameraTargetBounds,
