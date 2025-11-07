@@ -12,14 +12,12 @@ dependencies:
   flutter:
     sdk: flutter
   maplibre_gl_platform_interface:
-    git:
-      url: git@github.com:dronetag/flutter-maplibre-gl.git
-      path: maplibre_gl_platform_interface
+    version: 0.22.0+1
+    hosted: https://dart.cloudsmith.io/dronetag/software/
     
   maplibre_gl_web:
-    git:
-      url: git@github.com:dronetag/flutter-maplibre-gl.git
-      path: maplibre_gl_web
+    version: 0.22.0+1
+    hosted: https://dart.cloudsmith.io/dronetag/software/
 
 dev_dependencies:
   very_good_analysis: ^5.0.0
