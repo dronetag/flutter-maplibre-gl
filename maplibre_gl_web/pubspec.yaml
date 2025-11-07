@@ -22,7 +22,9 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   image: ^4.8.0
-  maplibre_gl_platform_interface: ^0.26.0
+  maplibre_gl_platform_interface:
+    version: 0.26.0+1
+    hosted: https://dart.cloudsmith.io/dronetag/software/
   meta: ^1.17.0
   web: ^1.1.1
 
