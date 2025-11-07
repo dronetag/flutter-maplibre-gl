@@ -1,17 +1,33 @@
 part of '../maplibre_gl.dart';
 
+sealed class OfflineRegionArea {
+  const OfflineRegionArea();
+}
+
+final class OfflineRegionBounds extends OfflineRegionArea {
+  final LatLngBounds bounds;
+
+  const OfflineRegionBounds({required this.bounds});
+}
+
+final class OfflineRegionGeometry extends OfflineRegionArea {
+  final Map<String, dynamic> geometry;
+
+  const OfflineRegionGeometry({required this.geometry});
+}
+
 /// Description of region to be downloaded. Identifier will be generated when
 /// the download is initiated.
 class OfflineRegionDefinition {
   const OfflineRegionDefinition({
-    required this.bounds,
+    required this.area,
     required this.mapStyleUrl,
     required this.minZoom,
     required this.maxZoom,
     this.includeIdeographs = false,
   });
 
-  final LatLngBounds bounds;
+  final OfflineRegionArea area;
   final String mapStyleUrl;
   final double minZoom;
   final double maxZoom;
@@ -19,11 +35,18 @@ class OfflineRegionDefinition {
 
   @override
   String toString() =>
-      "OfflineRegionDefinition, bounds = $bounds, mapStyleUrl = $mapStyleUrl, minZoom = $minZoom, maxZoom = $maxZoom";
+      "OfflineRegionDefinition, bounds = $area, mapStyleUrl = $mapStyleUrl, minZoom = $minZoom, maxZoom = $maxZoom";
 
   Map<String, dynamic> toMap() {
     final data = <String, dynamic>{};
-    data['bounds'] = bounds.toList();
+
+    switch (area) {
+      case OfflineRegionBounds(:final bounds):
+        data['bounds'] = bounds.toList();
+      case OfflineRegionGeometry(:final geometry):
+        data['geometry'] = geometry;
+    }
+
     data['mapStyleUrl'] = mapStyleUrl;
     data['minZoom'] = minZoom;
     data['maxZoom'] = maxZoom;
@@ -32,8 +55,17 @@ class OfflineRegionDefinition {
   }
 
   factory OfflineRegionDefinition.fromMap(Map<String, dynamic> map) {
+    final area = switch (map) {
+      _ when map.containsKey('bounds') =>
+        OfflineRegionBounds(bounds: _latLngBoundsFromList(map['bounds'])),
+      _ when map.containsKey('geometry') =>
+        OfflineRegionGeometry(geometry: map['geometry']),
+      _ => throw ArgumentError(
+          'Offline region area was not provided via bounds or geometry field'),
+    };
+
     return OfflineRegionDefinition(
-      bounds: _latLngBoundsFromList(map['bounds']),
+      area: area,
       mapStyleUrl: map['mapStyleUrl'],
       // small integers may deserialize to Int
       minZoom: map['minZoom'].toDouble(),

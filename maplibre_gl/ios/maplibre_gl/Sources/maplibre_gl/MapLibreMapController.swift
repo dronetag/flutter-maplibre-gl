@@ -1817,13 +1817,14 @@ class MapLibreMapController: NSObject, FlutterPlatformView, MLNMapViewDelegate, 
             !styleString.hasPrefix("http://"),
             !styleString.hasPrefix("https://"),
             !styleString.hasPrefix("mapbox://")
+            !styleString.hasPrefix("file://")
         {
             // We are assuming that the style will be loaded from an asset here.
             let assetPath = registrar.lookupKey(forAsset: styleString)
             mapView.styleURL = URL(string: assetPath, relativeTo: Bundle.main.resourceURL)
 
-        } else if (styleString.hasPrefix("file://")) {
-            if let path = Bundle.main.path(forResource: styleString.deletingPrefix("file://"), ofType: "json") {
+        } else if (styleString.hasPrefix("asset://")) {
+            if let path = Bundle.main.path(forResource: styleString.deletingPrefix("asset://"), ofType: "json") {
                 let url = URL(fileURLWithPath: path)
                 mapView.styleURL = url
             } else {

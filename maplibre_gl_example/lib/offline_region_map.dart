@@ -30,14 +30,14 @@ class _OfflineRegionMapState extends State<OfflineRegionMap> {
         ),
         styleString: widget.item.offlineRegionDefinition.mapStyleUrl,
         cameraTargetBounds: CameraTargetBounds(
-          widget.item.offlineRegionDefinition.bounds,
+          widget.item.bounds,
         ),
       ),
     );
   }
 
   LatLng get _center {
-    final bounds = widget.item.offlineRegionDefinition.bounds;
+    final bounds = widget.item.bounds;
     final lat = (bounds.southwest.latitude + bounds.northeast.latitude) / 2;
     final lng = (bounds.southwest.longitude + bounds.northeast.longitude) / 2;
     return LatLng(lat, lng);

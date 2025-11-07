@@ -5,36 +5,48 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'offline_region_map.dart';
 import 'page.dart';
 
-final LatLngBounds hawaiiBounds = LatLngBounds(
-  southwest: const LatLng(17.26672, -161.14746),
-  northeast: const LatLng(23.76523, -153.74267),
+final hawaiiBounds = OfflineRegionBounds(
+  bounds: LatLngBounds(
+    southwest: const LatLng(17.26672, -161.14746),
+    northeast: const LatLng(23.76523, -153.74267),
+  ),
 );
 
-final LatLngBounds santiagoBounds = LatLngBounds(
-  southwest: const LatLng(-33.5597, -70.49102),
-  northeast: const LatLng(-33.33282, -153.74267),
+final santiagoBounds = OfflineRegionBounds(
+  bounds: LatLngBounds(
+    southwest: const LatLng(-33.5597, -70.49102),
+    northeast: const LatLng(-33.33282, -153.74267),
+  ),
 );
 
-final LatLngBounds aucklandBounds = LatLngBounds(
-  southwest: const LatLng(-36.87838, 174.73205),
-  northeast: const LatLng(-36.82838, 174.79745),
+final aucklandBounds = OfflineRegionBounds(
+  bounds: LatLngBounds(
+    southwest: const LatLng(-36.87838, 174.73205),
+    northeast: const LatLng(-36.82838, 174.79745),
+  ),
 );
+
+final List<OfflineRegionBounds> regionBounds = [
+  hawaiiBounds,
+  santiagoBounds,
+  aucklandBounds,
+];
 
 final List<OfflineRegionDefinition> regionDefinitions = [
   OfflineRegionDefinition(
-    bounds: hawaiiBounds,
+    area: regionBounds[0],
     minZoom: 3.0,
     maxZoom: 8.0,
     mapStyleUrl: MapLibreStyles.demo,
   ),
   OfflineRegionDefinition(
-    bounds: santiagoBounds,
+    area: regionBounds[1],
     minZoom: 10.0,
     maxZoom: 16.0,
     mapStyleUrl: MapLibreStyles.demo,
   ),
   OfflineRegionDefinition(
-    bounds: aucklandBounds,
+    area: regionBounds[2],
     minZoom: 13.0,
     maxZoom: 16.0,
     mapStyleUrl: MapLibreStyles.demo,
@@ -46,6 +58,7 @@ final List<String> regionNames = ['Hawaii', 'Santiago', 'Auckland'];
 class OfflineRegionListItem {
   OfflineRegionListItem({
     required this.offlineRegionDefinition,
+    required this.bounds,
     required this.downloadedId,
     required this.isDownloading,
     required this.name,
@@ -53,6 +66,7 @@ class OfflineRegionListItem {
   });
 
   final OfflineRegionDefinition offlineRegionDefinition;
+  final LatLngBounds bounds;
   final int? downloadedId;
   final bool isDownloading;
   final String name;
@@ -64,6 +78,7 @@ class OfflineRegionListItem {
   }) =>
       OfflineRegionListItem(
         offlineRegionDefinition: offlineRegionDefinition,
+        bounds: bounds,
         name: name,
         estimatedTiles: estimatedTiles,
         downloadedId: downloadedId,
@@ -76,6 +91,7 @@ class OfflineRegionListItem {
 final List<OfflineRegionListItem> allRegions = [
   OfflineRegionListItem(
     offlineRegionDefinition: regionDefinitions[0],
+    bounds: regionBounds[0].bounds,
     downloadedId: null,
     isDownloading: false,
     name: regionNames[0],
@@ -83,6 +99,7 @@ final List<OfflineRegionListItem> allRegions = [
   ),
   OfflineRegionListItem(
     offlineRegionDefinition: regionDefinitions[1],
+    bounds: regionBounds[1].bounds,
     downloadedId: null,
     isDownloading: false,
     name: regionNames[1],
@@ -90,6 +107,7 @@ final List<OfflineRegionListItem> allRegions = [
   ),
   OfflineRegionListItem(
     offlineRegionDefinition: regionDefinitions[2],
+    bounds: regionBounds[2].bounds,
     downloadedId: null,
     isDownloading: false,
     name: regionNames[2],
