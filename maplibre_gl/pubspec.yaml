@@ -12,8 +12,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  maplibre_gl_platform_interface: ^0.25.0
-  maplibre_gl_web: ^0.25.0
+  maplibre_gl_platform_interface:
+    version: 0.25.0+1
+    hosted: https://dart.cloudsmith.io/dronetag/software/
+
+  maplibre_gl_web:
+    version: 0.25.0+1
+    hosted: https://dart.cloudsmith.io/dronetag/software/
 
 dev_dependencies:
   very_good_analysis: ^10.0.0
