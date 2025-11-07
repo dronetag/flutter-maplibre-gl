@@ -1,9 +1,9 @@
 name: maplibre_gl_example
 description: Demonstrates how to use the maplibre_gl plugin.
 publish_to: 'none'
-version: 0.24.1
-repository: https://github.com/maplibre/flutter-maplibre-gl
-issue_tracker: https://github.com/maplibre/flutter-maplibre-gl/issues
+version: 1.0.0+1
+repository: https://github.com/dronetag/flutter-maplibre-gl
+issue_tracker: https://github.com/dronetag/flutter-maplibre-gl/issues
 resolution: workspace
 
 environment:
