@@ -27,6 +27,7 @@ import 'package:maplibre_gl_web/src/interop/style/feature_identifier_interop.dar
 import 'package:maplibre_gl_web/src/interop/ui/control/geolocate_control_interop.dart';
 import 'package:maplibre_gl_web/src/layer_tools.dart';
 import 'package:maplibre_gl_web/src/style/sources/geojson_source.dart';
+import 'package:maplibre_gl_web/src/style/sources/geojson_source_diff.dart';
 import 'package:maplibre_gl_web/src/ui/camera.dart';
 import 'package:maplibre_gl_web/src/ui/control/attribution_control.dart';
 import 'package:maplibre_gl_web/src/ui/control/geolocate_control.dart';
